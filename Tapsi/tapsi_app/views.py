@@ -1,31 +1,90 @@
-from django.http.response import HttpResponse, JsonResponse
+from django.http import JsonResponse, HttpResponse
 from tapsi_app.models import Trip
 from driver_app.models import Driver
 from customer_app.models import Customer
-import math
+from coupon_app.models import Coupon
+import json
+from datetime import date
 
 
 def welcome(request):
     return HttpResponse("Welcome to Tapsi")
 
 
-def find_driver(request, driver_name):
-    driver = Driver.objects.get(first_name=driver_name)
-    return driver
+def create_trip(request, driver_name, customer_name):
+    if request.method == "GET":
+        try:
+            driver = Driver.objects.get(first_name=driver_name)
+            customer = Customer.objects.get(first_name=customer_name)
+
+            base_trip_cost = (
+                abs(
+                    (customer.source_x + customer.source_y)
+                    - (customer.destination_x + customer.destination_y)
+                )
+                * 10000
+            )
+            if base_trip_cost == 0:
+                base_trip_cost = 100000
+
+            coupon = customer.coupons
+            if (
+                coupon
+                and coupon.coupon_availability
+                and coupon.expire_date >= date.today()
+            ):
+                discount = base_trip_cost * (coupon.percent / 100)
+                trip_cost = base_trip_cost - discount
+            else:
+                trip_cost = base_trip_cost
+                coupon = None
+
+            trip = Trip.objects.create(
+                driver=driver,
+                customer=customer,
+                coupon=coupon,
+                payment_status=False,
+                trip_cost=trip_cost,
+            )
+
+            driver.wallet += trip_cost
+            driver.save()
+
+            if coupon:
+                coupon.coupon_availability = False
+                coupon.save()
+
+            return JsonResponse({"status": "success", "trip_id": trip.trip_id})
+        except Driver.DoesNotExist:
+            return JsonResponse(
+                {"status": "error", "message": "Driver not found"}, status=404
+            )
+        except Customer.DoesNotExist:
+            return JsonResponse(
+                {"status": "error", "message": "Customer not found"}, status=404
+            )
+        except Exception as e:
+            return JsonResponse({"status": "error", "message": str(e)}, status=500)
+
+    return JsonResponse(
+        {"status": "error", "message": "Invalid request method"}, status=405
+    )
 
 
-def find_customer(request, customer_name):
-    customer = Customer.objects.get(first_name=customer_name)
-    return customer
+def trip_list(request):
+    trips = Trip.objects.all()
+    trip_data = []
 
+    for trip in trips:
+        trip_data.append(
+            {
+                "trip_id": trip.trip_id,
+                "driver": trip.driver.first_name,
+                "customer": trip.customer.first_name,
+                "trip_cost": trip.trip_cost,
+                "payment_status": trip.payment_status,
+                "coupon": (trip.coupon.title if trip.coupon else None),
+            }
+        )
 
-def calculate_trip_cost(request, customer_name):
-    customer = find_customer(request , customer_name)
-    return abs((customer.source_x + customer.source_y) - (customer.destination_x + customer.destination_y)) * 10000
-
-
-def add_driver_wallet(request, driver_name , customer_name):
-    driver = find_driver(request, driver_name)
-    driver.trip_cost = calculate_trip_cost(request , customer_name)
-    driver.wallet = driver.wallet + calculate_trip_cost(request , customer_name)
-    return HttpResponse(driver.trip_cost)
+    return JsonResponse(trip_data, safe=False)

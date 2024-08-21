@@ -1,8 +1,6 @@
 from django.http.response import HttpResponse, JsonResponse
 from driver_app.models import Driver
 
-def welcome(request):
-    return HttpResponse("Welcome to Tapsi")
 
 def driver_list(request):
     all_drivers = Driver.objects.all()

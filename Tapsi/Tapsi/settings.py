@@ -37,6 +37,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'driver_app',
+    'customer_app',
+    'tapsi_app',
+    'coupon_app',
 ]
 
 MIDDLEWARE = [
