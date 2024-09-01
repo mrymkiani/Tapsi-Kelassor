@@ -6,7 +6,7 @@ from coupon_app.models import Coupon
 import json
 from datetime import date
 from rest_framework.generics import ListAPIView, RetrieveAPIView , CreateAPIView,ListCreateAPIView, RetrieveUpdateDestroyAPIView
-from .serialize import CopunSerializer , Transcreate , Factorserialize
+from .serialize import Triperializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.views import TokenObtainPairView , token_refresh
 
@@ -92,3 +92,18 @@ def trip_list(request):
         )
 
     return JsonResponse(trip_data, safe=False)
+
+
+class TripDetail(ListCreateAPIView):
+    queryset = Trip.objects.all()
+    serializer_class = Triperializer
+    permission_classes = [IsAuthenticated]
+    def get_queryset(self):
+        return Trip.objects.filter(user=self.request.user)
+
+class TripModifier(RetrieveUpdateDestroyAPIView):
+    queryset = Trip.objects.all()
+    serializer_class = Triperializer
+    permission_classes = [IsAuthenticated]
+    def get_queryset(self):
+        return Trip.objects.filter(user=self.request.user)
