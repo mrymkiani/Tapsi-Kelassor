@@ -9,6 +9,18 @@ from rest_framework.generics import ListAPIView, RetrieveAPIView , CreateAPIView
 from .serialize import Triperializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.views import TokenObtainPairView , token_refresh
+from django.db import transaction
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.views import TokenObtainPairView,TokenRefreshView
+
+class Login(TokenObtainPairView):
+    pass
+
+
+class Refresh(TokenRefreshView):
+    pass
+
+
 
 
 def welcome(request):
@@ -107,3 +119,21 @@ class TripModifier(RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated]
     def get_queryset(self):
         return Trip.objects.filter(user=self.request.user)
+    
+    
+def sale(request , inp_id):
+    if request.method == 'GET':
+        selected_trip = Trip.objects.get(pk = inp_id)
+        if selected_trip.customer.wallet >= selected_trip.trip_cost:
+            with transaction.atomic():
+                selected_trip.customer.wallet -= selected_trip.trip_cost
+                selected_trip.driver.wallet += selected_trip.trip_cost
+                selected_trip.customer.save()
+                selected_trip.driver.save()
+        else:
+            return HttpResponse("not enough money")
+    else:
+        return HttpResponse("no")
+            
+            
+            

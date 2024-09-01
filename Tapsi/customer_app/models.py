@@ -49,6 +49,7 @@ class Customer(models.Model):
         help_text="Indicate if the customer is available for trips."
     )
 
+    wallet = models.FloatField(verbose_name="Wallet",default=0)
     def __str__(self) -> str:
         return self.first_name
 

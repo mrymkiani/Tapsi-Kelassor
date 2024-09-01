@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'customer_app',
     'tapsi_app',
     'coupon_app',
+    'rest_framework'
 ]
 
 MIDDLEWARE = [
