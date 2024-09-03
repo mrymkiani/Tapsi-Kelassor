@@ -1,4 +1,8 @@
 from django.urls import path
-from driver_app.views import  driver_list
+from .views import *
 
-urlpatterns = [path("", driver_list)]
+urlpatterns = [
+    path("driver-list/", DriverView.as_view()),
+    path("create-driver/", DriverView.as_view()),
+    path("drivers/<int:pk>/", DriverDetail.as_view()),
+]

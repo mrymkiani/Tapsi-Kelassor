@@ -1,5 +1,8 @@
 from django.http.response import HttpResponse, JsonResponse
 from coupon_app.models import Coupon
+from .serialziers import CouponSerializer
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.permissions import IsAuthenticated
 
 
 def coupon_list(request):
@@ -14,4 +17,18 @@ def coupon_list(request):
         }
         my_coupon_list.append(coupon_dictionary)
 
-    return JsonResponse(my_coupon_list,safe=False)
+    return JsonResponse(my_coupon_list, safe=False)
+
+
+class CouponView(ListCreateAPIView):
+    queryset = Coupon.objects.all()
+    serializer_class = CouponSerializer
+    permission_classes = [IsAuthenticated]
+    
+    
+
+class CouponDetail(RetrieveUpdateDestroyAPIView):
+    queryset = Coupon.objects.all()
+    serializer_class = CouponSerializer
+    permission_classes = [IsAuthenticated]
+    

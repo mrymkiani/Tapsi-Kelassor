@@ -1,5 +1,8 @@
 from django.http.response import HttpResponse, JsonResponse
 from customer_app.models import Customer
+from rest_framework.permissions import IsAuthenticated
+from .serializers import *
+from rest_framework.generics import ListCreateAPIView,RetrieveUpdateDestroyAPIView
 
 
 def customer_list(request):
@@ -39,3 +42,22 @@ def customer_list_by_trip_type(request, trip_type):
         }
         my_customer_list.append(customer_dictionary)
     return JsonResponse(my_customer_list, safe=False)
+
+
+
+class CustomerView(ListCreateAPIView):
+    queryset = Customer.objects.all()
+    serializer_class = CustomerSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self):
+        return Customer.objects.filter(user = self.request.user)
+    
+    
+class CustomerDetail(RetrieveUpdateDestroyAPIView):
+    queryset = Customer.objects.all()
+    serializer_class = CustomerSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self):
+        return Customer.objects.filter(user = self.request.user)
