@@ -110,12 +110,15 @@ class TripDetail(ListCreateAPIView):
     queryset = Trip.objects.all()
     serializer_class = Triperializer
     permission_classes = [IsAuthenticated]
+    def get_queryset(self):
+        return Trip.objects.filter(user = self.request.user)
 
 class TripModifier(RetrieveUpdateDestroyAPIView):
     queryset = Trip.objects.all()
     serializer_class = Triperializer
     permission_classes = [IsAuthenticated]
-    
+    def get_queryset(self):
+        return Trip.objects.filter(user = self.request.user)    
     
     
 @csrf_exempt    
