@@ -5,13 +5,16 @@ from customer_app.models import Customer
 from coupon_app.models import Coupon
 import json
 from datetime import date
-from rest_framework.generics import ListAPIView, RetrieveAPIView , CreateAPIView,ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.generics import (
+    ListCreateAPIView,
+    RetrieveUpdateDestroyAPIView,
+)
 from .serialize import Triperializer
 from rest_framework.permissions import IsAuthenticated
 from django.db import transaction
-from rest_framework.permissions import IsAuthenticated
-from rest_framework_simplejwt.views import TokenObtainPairView,TokenRefreshView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from django.views.decorators.csrf import csrf_exempt
+
 
 class Login(TokenObtainPairView):
     pass
@@ -21,12 +24,10 @@ class Refresh(TokenRefreshView):
     pass
 
 
-
-
 def welcome(request):
     return HttpResponse("Welcome to Tapsi")
 
-
+@csrf_exempt
 def create_trip(request, driver_name, customer_name):
     if request.method == "GET":
         try:
@@ -38,10 +39,10 @@ def create_trip(request, driver_name, customer_name):
                     (customer.source_x + customer.source_y)
                     - (customer.destination_x + customer.destination_y)
                 )
-                * 10000
+                * 100
             )
             if base_trip_cost == 0:
-                base_trip_cost = 100000
+                base_trip_cost = 100
 
             coupon = customer.coupons
             if (
@@ -110,20 +111,19 @@ class TripDetail(ListCreateAPIView):
     queryset = Trip.objects.all()
     serializer_class = Triperializer
     permission_classes = [IsAuthenticated]
-    def get_queryset(self):
-        return Trip.objects.filter(user = self.request.user)
+
+
 
 class TripModifier(RetrieveUpdateDestroyAPIView):
     queryset = Trip.objects.all()
     serializer_class = Triperializer
     permission_classes = [IsAuthenticated]
-    def get_queryset(self):
-        return Trip.objects.filter(user = self.request.user)    
-    
-    
-@csrf_exempt    
+
+
+
+@csrf_exempt
 def sale(request, inp_id):
-    if request.method == 'GET':
+    if request.method == "GET":
         selected_trip = Trip.objects.get(pk=inp_id)
         if selected_trip.customer.wallet >= selected_trip.trip_cost:
             with transaction.atomic():
@@ -138,9 +138,3 @@ def sale(request, inp_id):
             return HttpResponse("Not enough money")
     else:
         return HttpResponse("Invalid request method")
-    
-    
-    
-            
-            
-            

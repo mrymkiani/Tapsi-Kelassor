@@ -35,7 +35,8 @@ class Driver(models.Model):
     )
     wallet = models.FloatField(
         verbose_name="Wallet Balance",
-        help_text="Enter the current balance in the driver's wallet."
+        help_text="Enter the current balance in the driver's wallet.",
+        default=0.00
     )
 
     def __str__(self) -> str:
