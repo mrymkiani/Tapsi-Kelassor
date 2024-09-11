@@ -3,6 +3,8 @@ from coupon_app.models import Coupon
 from .serialziers import CouponSerializer
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import IsAuthenticated
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters
 
 
 def coupon_list(request):
@@ -24,6 +26,10 @@ class CouponView(ListCreateAPIView):
     queryset = Coupon.objects.all()
     serializer_class = CouponSerializer
     permission_classes = [IsAuthenticated]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter]
+    ordering_fields = ["percent"]
+    search_fields = ["title"]
+    filterset_fields = ['percent']
     
     
 

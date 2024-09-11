@@ -14,6 +14,8 @@ from rest_framework.permissions import IsAuthenticated
 from django.db import transaction
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from django.views.decorators.csrf import csrf_exempt
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters
 
 
 class Login(TokenObtainPairView):
@@ -111,6 +113,9 @@ class TripDetail(ListCreateAPIView):
     queryset = Trip.objects.all()
     serializer_class = Triperializer
     permission_classes = [IsAuthenticated]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter]
+    ordering_fields = ['date']
+    filterset_fields = ['customer']
 
 
 

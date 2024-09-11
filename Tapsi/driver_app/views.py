@@ -3,6 +3,8 @@ from driver_app.models import Driver
 from .serialziers import DriverSerializer
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import IsAuthenticated
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters
 
 
 def driver_list(request):
@@ -26,6 +28,7 @@ class DriverView(ListCreateAPIView):
     queryset = Driver.objects.all()
     serializer_class = DriverSerializer
     permission_classes = [IsAuthenticated]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter]
 
     def get_queryset(self):
         return Driver.objects.filter(user=self.request.user)
