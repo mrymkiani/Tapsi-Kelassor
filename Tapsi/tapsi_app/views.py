@@ -12,11 +12,10 @@ from rest_framework.generics import (
 from .serialize import Triperializer
 from rest_framework.permissions import IsAuthenticated
 from django.db import transaction
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from django.views.decorators.csrf import csrf_exempt
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
-
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 class Login(TokenObtainPairView):
     pass

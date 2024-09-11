@@ -3,6 +3,14 @@ from customer_app.models import Customer
 from rest_framework.permissions import IsAuthenticated
 from .serializers import *
 from rest_framework.generics import ListCreateAPIView,RetrieveUpdateDestroyAPIView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+
+class Login(TokenObtainPairView):
+    pass
+
+
+class Refresh(TokenRefreshView):
+    pass
 
 
 def customer_list(request):

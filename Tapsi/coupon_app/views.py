@@ -5,6 +5,15 @@ from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIV
 from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+
+class Login(TokenObtainPairView):
+    pass
+
+
+class Refresh(TokenRefreshView):
+    pass
+
 
 
 def coupon_list(request):
