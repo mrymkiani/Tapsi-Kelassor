@@ -10,4 +10,5 @@ urlpatterns = [
     path('login/', Login.as_view(), name='token_obtain_pair'),
     path('login/refresh/', Refresh.as_view(), name='token_refresh'),
     path('create-trip/' , TripDetail.as_view()),
+    path('rate-trip/<int:trip_id>/', rate_trip),
 ]

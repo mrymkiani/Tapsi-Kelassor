@@ -29,6 +29,9 @@ class DriverView(ListCreateAPIView):
     serializer_class = DriverSerializer
     permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter]
+    filterset_fields = ['car_model', 'car_color'] 
+    ordering_fields = ['first_name', 'wallet']  
+    search_fields = ['first_name', 'last_name', 'car_plate']
 
     def get_queryset(self):
         return Driver.objects.filter(user=self.request.user)

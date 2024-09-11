@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models import Avg
+from tapsi_app.models import Trip
 
 class Driver(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='drivers')
@@ -38,9 +40,15 @@ class Driver(models.Model):
         help_text="Enter the current balance in the driver's wallet.",
         default=0.00
     )
+    rating = models.FloatField(verbose_name="Driver Rating", default=0.0) 
 
     def __str__(self) -> str:
         return self.first_name
+    
+    def update_rating(self):
+        avg_rating = Trip.objects.filter(driver=self, rating__gt=0).aggregate(Avg('rating'))['rating__avg']
+        self.rating = avg_rating or 0
+        self.save()
 
     class Meta:
         verbose_name = "Driver"

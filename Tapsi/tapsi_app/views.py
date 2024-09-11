@@ -16,6 +16,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from django.shortcuts import get_object_or_404
+
 
 class Login(TokenObtainPairView):
     pass
@@ -27,6 +29,7 @@ class Refresh(TokenRefreshView):
 
 def welcome(request):
     return HttpResponse("Welcome to Tapsi")
+
 
 @csrf_exempt
 def create_trip(request, driver_name, customer_name):
@@ -112,17 +115,19 @@ class TripDetail(ListCreateAPIView):
     queryset = Trip.objects.all()
     serializer_class = Triperializer
     permission_classes = [IsAuthenticated]
-    filter_backends = [DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter]
-    ordering_fields = ['date']
-    filterset_fields = ['customer']
-
+    filter_backends = [
+        DjangoFilterBackend,
+        filters.OrderingFilter,
+        filters.SearchFilter,
+    ]
+    ordering_fields = ["date"]
+    filterset_fields = ["customer"]
 
 
 class TripModifier(RetrieveUpdateDestroyAPIView):
     queryset = Trip.objects.all()
     serializer_class = Triperializer
     permission_classes = [IsAuthenticated]
-
 
 
 @csrf_exempt
@@ -142,3 +147,36 @@ def sale(request, inp_id):
             return HttpResponse("Not enough money")
     else:
         return HttpResponse("Invalid request method")
+
+
+@csrf_exempt
+def rate_trip(request, trip_id):
+    if request.method == "POST":
+        try:
+
+            trip = get_object_or_404(Trip, pk=trip_id)
+
+            try:
+                data = json.loads(request.body)
+            except json.JSONDecodeError:
+                return JsonResponse({"error": "Invalid JSON"}, status=400)
+
+            rating = data.get("rating")
+
+            if rating < 0 or rating > 5:
+                return JsonResponse(
+                    {"error": "Rating must be between 0 and 5"}, status=400
+                )
+
+            trip.rating = rating
+            trip.save()
+            trip.driver.update_rating()
+
+            return JsonResponse(
+                {"message": "Rating submitted successfully", "trip_rating": trip.rating}
+            )
+
+        except ValueError:
+            return JsonResponse({"error": "Invalid rating value"}, status=400)
+
+    return JsonResponse({"error": "Invalid request method"}, status=405)
