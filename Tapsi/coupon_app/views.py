@@ -29,7 +29,7 @@ class CouponView(ListCreateAPIView):
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter]
     ordering_fields = ["percent"]
     search_fields = ["title"]
-    filterset_fields = ['percent']
+    filterset_fields = ['coupon_availability']
     
     
 

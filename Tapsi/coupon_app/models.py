@@ -14,7 +14,7 @@ class Coupon(models.Model):
         verbose_name="Discount Percentage",
         help_text="Enter the discount percentage provided by the coupon."
     )
-    percent = models.BooleanField(
+    coupon_availability = models.BooleanField(
         verbose_name="Coupon Availability",
         help_text="Indicate if the coupon is currently available for use."
     )
