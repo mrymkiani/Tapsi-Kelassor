@@ -17,7 +17,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from django.shortcuts import get_object_or_404
-
+import requests
 
 class Login(TokenObtainPairView):
     pass
@@ -182,3 +182,12 @@ def rate_trip(request, trip_id):
             return JsonResponse({"error": "Invalid rating value"}, status=400)
 
     return JsonResponse({"error": "Invalid request method"}, status=405)
+
+
+def api_to_neshan(request):
+    url = "https://api.neshan.org/v4/direction?type=car&origin=35.7052111,51.3350869&destination=35.7668379,51.3554544"
+    api_key = "service.2f93c88dfc154d7bb5af4c160c4faa09"
+    response = requests.get(url, headers={"Api-Key": api_key})
+    return JsonResponse(
+        json.loads(response.content)["routes"][0]["legs"][0]["summary"], safe=False
+    )
